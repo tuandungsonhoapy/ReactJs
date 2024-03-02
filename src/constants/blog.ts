@@ -42,3 +42,12 @@ export const initalPostList: Post[] = [
     title: 'Nơi nào có ý chí, nơi đó có con đường.'
   }
 ]
+
+export const defaultPost: Post = {
+  title: '',
+  id: '',
+  description: '',
+  publishDate: '',
+  published: false,
+  featuredImage: ''
+}
