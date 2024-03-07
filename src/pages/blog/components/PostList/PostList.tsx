@@ -1,13 +1,16 @@
-import { RootState } from 'store'
+import { RootState, useAppDispatch } from 'store'
 import PostItem from '../PostItem'
-import { useDispatch, useSelector } from 'react-redux'
-import { deletePost, setEditPost } from 'pages/blog/blog.reducer'
+import { useSelector } from 'react-redux'
+import { deletePost, getPostList, setEditPost } from 'pages/blog/blog.slice'
 import { toast } from 'react-toastify'
+import { useEffect } from 'react'
+import Skeleton from '../Skeleton'
 
 function PostList() {
   const postList = useSelector((state: RootState) => state.blog.postList)
+  const loading = useSelector((state: RootState) => state.blog.loading)
 
-  const disPatch = useDispatch()
+  const disPatch = useAppDispatch()
 
   const handleDeletePost = (postId: string) => {
     disPatch(deletePost(postId))
@@ -17,6 +20,10 @@ function PostList() {
   const handleShowEditPost = (postId: string) => {
     disPatch(setEditPost(postId))
   }
+
+  useEffect(() => {
+    disPatch(getPostList())
+  }, [disPatch])
 
   return (
     <div className='bg-white py-6 sm:py-8 lg:py-12'>
@@ -28,16 +35,23 @@ function PostList() {
           </p>
         </div>
         <div className='grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-2 xl:grid-cols-2 xl:gap-8'>
-          {postList.map((item) => {
-            return (
-              <PostItem
-                key={item.id}
-                post={item}
-                handleDeletePost={handleDeletePost}
-                handleShowEditPost={handleShowEditPost}
-              />
-            )
-          })}
+          {loading && (
+            <>
+              <Skeleton />
+              <Skeleton />
+            </>
+          )}
+          {!loading &&
+            postList.map((item) => {
+              return (
+                <PostItem
+                  key={item.id}
+                  post={item}
+                  handleDeletePost={handleDeletePost}
+                  handleShowEditPost={handleShowEditPost}
+                />
+              )
+            })}
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@ function PostItem({ post, handleDeletePost, handleShowEditPost }: PostItemType) 
             <button
               type='button'
               className='rounded-l-lg border border-gray-200 bg-white py-2 px-4 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700'
-              onClick={() => handleShowEditPost(post.id)}
+              onClick={() => handleShowEditPost(post.id || '')}
             >
               Edit
             </button>
@@ -34,7 +34,7 @@ function PostItem({ post, handleDeletePost, handleShowEditPost }: PostItemType) 
               type='button'
               className='rounded-r-lg border-t border-b border-r border-gray-200 bg-white py-2 px-4 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700'
               onClick={() => {
-                handleDeletePost(post.id)
+                handleDeletePost(post.id || '')
               }}
             >
               Delete
