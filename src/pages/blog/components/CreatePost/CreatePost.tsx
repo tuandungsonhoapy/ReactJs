@@ -1,30 +1,50 @@
-import { addPost, cancelEditPost, editPost } from 'pages/blog/blog.reducer'
+import { addPost, cancelEditPost, updatePost } from 'pages/blog/blog.slice'
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { Post } from 'types/blog.type'
 import { defaultPost } from 'constants/blog'
-import { RootState } from 'store'
+import { RootState, useAppDispatch } from 'store'
+
+interface FormError {
+  publishDate: string
+}
 
 function CreatePost() {
   console.log('re-render')
   const [formData, setFormData] = useState<Post>(defaultPost)
+  const [formError, setFormError] = useState<null | FormError>(null)
   const editPostValue = useSelector((state: RootState) => state.blog.editPostValue)
 
-  const disPatch = useDispatch()
+  const disPatch = useAppDispatch()
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault()
     disPatch(addPost(formData))
-    setFormData(defaultPost)
-    toast.success('Publish post successfully!')
+      .unwrap()
+      .then(() => {
+        setFormData(defaultPost)
+        toast.success('Publish post successfully!')
+      })
+      .catch((error: any) => {
+        setFormError(error.error)
+        toast.error('Add post failed!')
+      })
   }
 
   const handleUpdatePost = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault()
-    disPatch(editPost(formData))
-    setFormData(defaultPost)
-    toast.success('Update post successfully!')
+    disPatch(updatePost(formData))
+      .unwrap()
+      .then(() => {
+        toast.success('Update post successfully!')
+        setFormError(null)
+      })
+      .catch((error: any) => {
+        console.log('Check erro: ', error)
+        setFormError(error.error)
+        toast.error('Update post failed!')
+      })
   }
 
   const handleCancelEditPost = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -90,12 +110,17 @@ function CreatePost() {
         <input
           type='datetime-local'
           id='publishDate'
-          className='block w-56 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500'
+          className={`block w-56 rounded-lg border ${formError?.publishDate ? 'border-red-300 bg-red-50 p-2.5 text-sm text-red-900 focus:border-red-500 focus:outline-none focus:ring-red-500 placeholder-red-700' : 'border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500'}`}
           placeholder='Title'
           required
           value={formData.publishDate}
           onChange={(e) => setFormData((prev) => ({ ...prev, publishDate: e.target.value }))}
         />
+        {formError?.publishDate && (
+          <p className={`mt-2 text-sm text-red-600`}>
+            <span className='font-medium'>{formError.publishDate}</span>
+          </p>
+        )}
       </div>
       <div className='mb-6 flex items-center'>
         <input
